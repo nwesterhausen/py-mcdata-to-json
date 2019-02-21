@@ -1,5 +1,6 @@
 # Project specific file
-etc/config.yaml
+output
+mcdata_cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
