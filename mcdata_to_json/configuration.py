@@ -32,55 +32,58 @@ parser.add_argument("-q", "--quiet",
 args = parser.parse_args()
 
 # Minecraft dir from config
-MC_DIR = os.path.normpath(args.mc_dir) if os.path.isabs(
+MC_DIR: str = os.path.normpath(args.mc_dir) if os.path.isabs(
     args.mc_dir) else os.path.abspath(args.mc_dir)
-MCJAR_FILE = os.path.join(MC_DIR, args.jar_name)  # name pulled from config
+MCJAR_FILE: str = os.path.join(
+    MC_DIR, args.jar_name)  # name pulled from config
 
-OUTPUT_DIR = os.path.normpath(args.output_dir) if os.path.isabs(
+OUTPUT_DIR: str = os.path.normpath(args.output_dir) if os.path.isabs(
     args.output_dir) else os.path.abspath(args.output_dir)
 # cache dir from config
-WORK_DIR = os.path.normpath(args.work_dir) if os.path.isabs(
+WORK_DIR: str = os.path.normpath(args.work_dir) if os.path.isabs(
     args.work_dir) else os.path.abspath(args.work_dir)
 
 ## COMPUTED PATHS ##
-PROPERTIES_FILE = os.path.join(MC_DIR, 'server.properties')
-USERCACHE_FILE = os.path.join(MC_DIR, 'usercache.json')
-OPSLIST_FILE = os.path.join(MC_DIR, 'ops.json')
-LOGS_DIR = os.path.join(MC_DIR, 'logs')
-WORLD_DIR = os.path.join(MC_DIR, 'world')
-WORLD_DATA_DIR = os.path.join(WORLD_DIR, 'data')
-DATAPACKS_DIR = os.path.join(WORLD_DIR, 'datapacks')
-STATS_DIR = os.path.join(WORLD_DIR, 'stats')
-ADVANCEMENTS_DIR = os.path.join(WORLD_DIR, 'advancements')
-PLAYERDATA_DIR = os.path.join(WORLD_DIR, 'playerdata')
-LEVELDAT_FILE = os.path.join(WORLD_DIR, 'level.dat')
-OVERWORLD_REGION_DIR = os.path.join(WORLD_DIR, 'region')
-NETHER_DIR = os.path.join(WORLD_DIR, 'DIM-1')
-NETHER_REGION_DIR = os.path.join(NETHER_DIR, 'region')
-NETHER_DATA_DIR = os.path.join(NETHER_DIR, 'data')
-END_DIR = os.path.join(WORLD_DIR, 'DIM1')
-END_REGION_DIR = os.path.join(END_DIR, 'region')
-END_DATA_DIR = os.path.join(END_DIR, 'playerdata')
-TEMP_DIR = os.path.join(WORK_DIR, '.temp')
-EXTRACTED_DIR = os.path.join(WORK_DIR, 'extracted')
-GENERATED_DIR = os.path.join(WORK_DIR, 'generated')
-GENERATED_DATA_DIR = os.path.join(GENERATED_DIR, 'data')
-EXTRACTED_DATA_DIR = os.path.join(EXTRACTED_DIR, 'data')
-EXTRACTED_ASSETS_DIR = os.path.join(EXTRACTED_DIR, 'assets')
-CACHED_MCA_JSON_DIR = os.path.join(WORK_DIR, 'mcajson')
-TEMP_PLAYERDATA_JSON_DIR = os.path.join(TEMP_DIR, 'playerdata')
-TEMP_LOG_JSON_DIR = os.path.join(TEMP_DIR, 'logs')
-TEMP_ADVANCEMENT_JSON_DIR = os.path.join(TEMP_DIR, 'advancements')
-TEMP_PROFILE_JSON_DIR = os.path.join(TEMP_DIR, 'profiles')
+PROPERTIES_FILE: str = os.path.join(MC_DIR, 'server.properties')
+USERCACHE_FILE: str = os.path.join(MC_DIR, 'usercache.json')
+OPSLIST_FILE: str = os.path.join(MC_DIR, 'ops.json')
+LOGS_DIR: str = os.path.join(MC_DIR, 'logs')
+WORLD_DIR: str = os.path.join(MC_DIR, 'world')
+WORLD_DATA_DIR: str = os.path.join(WORLD_DIR, 'data')
+DATAPACKS_DIR: str = os.path.join(WORLD_DIR, 'datapacks')
+STATS_DIR: str = os.path.join(WORLD_DIR, 'stats')
+ADVANCEMENTS_DIR: str = os.path.join(WORLD_DIR, 'advancements')
+PLAYERDATA_DIR: str = os.path.join(WORLD_DIR, 'playerdata')
+LEVELDAT_FILE: str = os.path.join(WORLD_DIR, 'level.dat')
+OVERWORLD_REGION_DIR: str = os.path.join(WORLD_DIR, 'region')
+NETHER_DIR: str = os.path.join(WORLD_DIR, 'DIM-1')
+NETHER_REGION_DIR: str = os.path.join(NETHER_DIR, 'region')
+NETHER_DATA_DIR: str = os.path.join(NETHER_DIR, 'data')
+END_DIR: str = os.path.join(WORLD_DIR, 'DIM1')
+END_REGION_DIR: str = os.path.join(END_DIR, 'region')
+END_DATA_DIR: str = os.path.join(END_DIR, 'data')
+TEMP_DIR: str = os.path.join(WORK_DIR, '.temp')
+EXTRACTED_DIR: str = os.path.join(WORK_DIR, 'extracted')
+GENERATED_DIR: str = os.path.join(WORK_DIR, 'generated')
+GENERATED_DATA_DIR: str = os.path.join(GENERATED_DIR, 'data')
+EXTRACTED_DATA_DIR: str = os.path.join(EXTRACTED_DIR, 'data')
+EXTRACTED_ASSETS_DIR: str = os.path.join(EXTRACTED_DIR, 'assets')
+CACHED_MCA_JSON_DIR: str = os.path.join(WORK_DIR, 'mcajson')
+TEMP_PLAYERDATA_JSON_DIR: str = os.path.join(TEMP_DIR, 'playerdata')
+TEMP_LOG_JSON_DIR: str = os.path.join(TEMP_DIR, 'logs')
+TEMP_ADVANCEMENT_JSON_DIR: str = os.path.join(TEMP_DIR, 'advancements')
+TEMP_PROFILE_JSON_DIR: str = os.path.join(TEMP_DIR, 'profiles')
 
 NONEXISTENT_FILES: List[str] = []
 
 
-def validatePaths():
-    validateDir(MC_DIR, "minecraft dir invalid", True)
+def validatePaths() -> None:
+    validateDir(MC_DIR, "minecraft dir invalid", quit_on_failure=True)
     validateFile(MCJAR_FILE, "minecraft server jar doesn't exist")
-    validateDir(OUTPUT_DIR, "specified output dir doesn't exist")
-    validateDir(WORK_DIR, "specified cache dir doesn't exist")
+    validateDir(OUTPUT_DIR, "specified output dir doesn't exist",
+                create_dir_if_not_exists=True)
+    validateDir(WORK_DIR, "specified cache dir doesn't exist",
+                create_dir_if_not_exists=True)
     validateFile(PROPERTIES_FILE, "server.properties doesn't exist")
     validateFile(USERCACHE_FILE, "usercache.json not found")
     validateFile(OPSLIST_FILE, "ops.json not found")
@@ -99,23 +102,34 @@ def validatePaths():
     validateDir(END_DIR, "DIM1 not found in world dir")
     validateDir(END_REGION_DIR, "region not found in DIM1")
     validateDir(END_DATA_DIR, "data not found in DIM1")
-    validateDir(TEMP_DIR, "temp dir doesn't exist")
-    validateDir(EXTRACTED_DIR, "extracted data dir doesn't exist")
-    validateDir(GENERATED_DIR, "generated data dir doesn't exist")
-    validateDir(GENERATED_DATA_DIR, "generated data dir doesn't exist")
-    validateDir(EXTRACTED_DATA_DIR, "extracted data dir doesn't exist")
-    validateDir(EXTRACTED_ASSETS_DIR, "extracted assets dir doesn't exist")
-    validateDir(CACHED_MCA_JSON_DIR, "cached mca json file dir not found")
+    validateDir(TEMP_DIR, "temp dir doesn't exist",
+                create_dir_if_not_exists=True)
+    validateDir(EXTRACTED_DIR, "extracted data dir doesn't exist",
+                create_dir_if_not_exists=True)
+    validateDir(GENERATED_DIR, "generated data dir doesn't exist",
+                create_dir_if_not_exists=True)
+    validateDir(GENERATED_DATA_DIR, "generated data dir doesn't exist",
+                create_dir_if_not_exists=True)
+    validateDir(EXTRACTED_DATA_DIR, "extracted data dir doesn't exist",
+                create_dir_if_not_exists=True)
+    validateDir(EXTRACTED_ASSETS_DIR, "extracted assets dir doesn't exist",
+                create_dir_if_not_exists=True)
+    validateDir(CACHED_MCA_JSON_DIR, "cached mca json file dir not found",
+                create_dir_if_not_exists=True)
     validateDir(TEMP_PLAYERDATA_JSON_DIR,
-                "temp playerdat json dir doesn't exist")
-    validateDir(TEMP_LOG_JSON_DIR, "temp log json dir doesn't exist")
+                "temp playerdat json dir doesn't exist",
+                create_dir_if_not_exists=True)
+    validateDir(TEMP_LOG_JSON_DIR, "temp log json dir doesn't exist",
+                create_dir_if_not_exists=True)
     validateDir(TEMP_ADVANCEMENT_JSON_DIR,
-                "temp advancement dir doesn't exist")
-    validateDir(TEMP_PROFILE_JSON_DIR, "temp profile dir doesn't exist")
+                "temp advancement dir doesn't exist",
+                create_dir_if_not_exists=True)
+    validateDir(TEMP_PROFILE_JSON_DIR, "temp profile dir doesn't exist",
+                create_dir_if_not_exists=True)
     _LOGGER.debug("Non-existent files: {}".format(NONEXISTENT_FILES))
 
 
-def validateFile(filepath: str, notfound_message: str, quit_on_failure=False):
+def validateFile(filepath: str, notfound_message: str, quit_on_failure=False) -> None:
     if not os.path.isfile(filepath):
         if quit_on_failure:
             _LOGGER.error("{}:{}".format(notfound_message, filepath))
@@ -127,11 +141,14 @@ def validateFile(filepath: str, notfound_message: str, quit_on_failure=False):
         _LOGGER.debug("{} is a file".format(os.path.basename(filepath)))
 
 
-def validateDir(dirpath: str, notfound_message: str, quit_on_failure=False):
+def validateDir(dirpath: str, notfound_message: str, quit_on_failure=False, create_dir_if_not_exists=False) -> None:
     if not os.path.isdir(dirpath):
         if quit_on_failure:
             _LOGGER.error("{}:{}".format(notfound_message, dirpath))
             sys.exit()
+        elif create_dir_if_not_exists:
+            os.mkdir(dirpath)
+            _LOGGER.info("Created {}.".format(os.path.basename(dirpath)))
         else:
             _LOGGER.warn("{}:{}".format(notfound_message, dirpath))
             NONEXISTENT_FILES.append(dirpath)
