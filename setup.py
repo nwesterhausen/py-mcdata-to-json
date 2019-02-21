@@ -93,6 +93,17 @@ class UploadCommand(Command):
         sys.exit()
 
 
+class GitTag(UploadCommand):
+    """Don't upload, only add the git tag"""
+
+    def run(self):
+        self.status('Pushing git tags…')
+        os.system('git tag v{0}'.format(about['__version__']))
+        os.system('git push --tags')
+
+        sys.exit()
+
+
 # Where the magic happens:
 setup(
     name=NAME,
@@ -128,5 +139,6 @@ setup(
     # $ setup.py publish support.
     cmdclass={
         'upload': UploadCommand,
+        'tag': GitTag
     },
 )
