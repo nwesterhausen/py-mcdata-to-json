@@ -12,30 +12,55 @@ _LOGGER = logging.getLogger(name=LOGGER_NAME)
 
 parser = ArgumentParser(
     description="Python tool to create JSON files from minecraft server data.")
-parser.add_argument("-c", "--config", dest="config_file",
-                    help="Configuration YAML", metavar="CONFIG", default="config.yaml")
-parser.add_argument("-i", "--minecraft-dir", dest="mc_dir",
-                    help="Directory of the minecraft server.", metavar="MINECRAFTDIR")
-parser.add_argument("-j", "--jar-name", dest="jar_name",
-                    help="Name of the miencraft server jar.", metavar="SERVERJAR",
-                    default="server.jar")
-parser.add_argument("-o", "--outdir", dest="output_dir",
-                    help="Destination directory for JSON files.", metavar="OUTPUTDIR",
-                    default="./output")
-parser.add_argument("-t", "--cachedir", dest="work_dir",
-                    help="Destination directory for JSON files.", metavar="CACHEDIR",
-                    default="./mcdata_cache")
-parser.add_argument("-q", "--quiet",
-                    action="store_false", dest="verbose", default=True,
-                    help="don't print status messages to stdout")
+parser.add_argument(
+    "-c",
+    "--config",
+    dest="config_file",
+    help="Configuration YAML",
+    metavar="CONFIG",
+    default="config.yaml")
+parser.add_argument(
+    "-i",
+    "--minecraft-dir",
+    dest="mc_dir",
+    help="Directory of the minecraft server.",
+    metavar="MINECRAFTDIR")
+parser.add_argument(
+    "-j",
+    "--jar-name",
+    dest="jar_name",
+    help="Name of the miencraft server jar.",
+    metavar="SERVERJAR",
+    default="server.jar")
+parser.add_argument(
+    "-o",
+    "--outdir",
+    dest="output_dir",
+    help="Destination directory for JSON files.",
+    metavar="OUTPUTDIR",
+    default="./output")
+parser.add_argument(
+    "-t",
+    "--cachedir",
+    dest="work_dir",
+    help="Destination directory for JSON files.",
+    metavar="CACHEDIR",
+    default="./mcdata_cache")
+parser.add_argument(
+    "-q",
+    "--quiet",
+    action="store_false",
+    dest="verbose",
+    default=True,
+    help="don't print status messages to stdout")
 
 args = parser.parse_args()
 
 # Minecraft dir from config
 MC_DIR: str = os.path.normpath(args.mc_dir) if os.path.isabs(
     args.mc_dir) else os.path.abspath(args.mc_dir)
-MCJAR_FILE: str = os.path.join(
-    MC_DIR, args.jar_name)  # name pulled from config
+MCJAR_FILE: str = os.path.join(MC_DIR,
+                               args.jar_name)  # name pulled from config
 
 OUTPUT_DIR: str = os.path.normpath(args.output_dir) if os.path.isabs(
     args.output_dir) else os.path.abspath(args.output_dir)
@@ -73,6 +98,7 @@ TEMP_PLAYERDATA_JSON_DIR: str = os.path.join(TEMP_DIR, 'playerdata')
 TEMP_LOG_JSON_DIR: str = os.path.join(TEMP_DIR, 'logs')
 TEMP_ADVANCEMENT_JSON_DIR: str = os.path.join(TEMP_DIR, 'advancements')
 TEMP_PROFILE_JSON_DIR: str = os.path.join(TEMP_DIR, 'profiles')
+TEMP_STATS_JSON_DIR: str = os.path.join(TEMP_DIR, 'stats')
 
 NONEXISTENT_FILES: List[str] = []
 
@@ -80,10 +106,14 @@ NONEXISTENT_FILES: List[str] = []
 def validatePaths() -> None:
     validateDir(MC_DIR, "minecraft dir invalid", quit_on_failure=True)
     validateFile(MCJAR_FILE, "minecraft server jar doesn't exist")
-    validateDir(OUTPUT_DIR, "specified output dir doesn't exist",
-                create_dir_if_not_exists=True)
-    validateDir(WORK_DIR, "specified cache dir doesn't exist",
-                create_dir_if_not_exists=True)
+    validateDir(
+        OUTPUT_DIR,
+        "specified output dir doesn't exist",
+        create_dir_if_not_exists=True)
+    validateDir(
+        WORK_DIR,
+        "specified cache dir doesn't exist",
+        create_dir_if_not_exists=True)
     validateFile(PROPERTIES_FILE, "server.properties doesn't exist")
     validateFile(USERCACHE_FILE, "usercache.json not found")
     validateFile(OPSLIST_FILE, "ops.json not found")
@@ -102,34 +132,57 @@ def validatePaths() -> None:
     validateDir(END_DIR, "DIM1 not found in world dir")
     validateDir(END_REGION_DIR, "region not found in DIM1")
     validateDir(END_DATA_DIR, "data not found in DIM1")
-    validateDir(TEMP_DIR, "temp dir doesn't exist",
-                create_dir_if_not_exists=True)
-    validateDir(EXTRACTED_DIR, "extracted data dir doesn't exist",
-                create_dir_if_not_exists=True)
-    validateDir(GENERATED_DIR, "generated data dir doesn't exist",
-                create_dir_if_not_exists=True)
-    validateDir(GENERATED_DATA_DIR, "generated data dir doesn't exist",
-                create_dir_if_not_exists=True)
-    validateDir(EXTRACTED_DATA_DIR, "extracted data dir doesn't exist",
-                create_dir_if_not_exists=True)
-    validateDir(EXTRACTED_ASSETS_DIR, "extracted assets dir doesn't exist",
-                create_dir_if_not_exists=True)
-    validateDir(CACHED_MCA_JSON_DIR, "cached mca json file dir not found",
-                create_dir_if_not_exists=True)
-    validateDir(TEMP_PLAYERDATA_JSON_DIR,
-                "temp playerdat json dir doesn't exist",
-                create_dir_if_not_exists=True)
-    validateDir(TEMP_LOG_JSON_DIR, "temp log json dir doesn't exist",
-                create_dir_if_not_exists=True)
-    validateDir(TEMP_ADVANCEMENT_JSON_DIR,
-                "temp advancement dir doesn't exist",
-                create_dir_if_not_exists=True)
-    validateDir(TEMP_PROFILE_JSON_DIR, "temp profile dir doesn't exist",
-                create_dir_if_not_exists=True)
+    validateDir(
+        TEMP_DIR, "temp dir doesn't exist", create_dir_if_not_exists=True)
+    validateDir(
+        EXTRACTED_DIR,
+        "extracted data dir doesn't exist",
+        create_dir_if_not_exists=True)
+    validateDir(
+        GENERATED_DIR,
+        "generated data dir doesn't exist",
+        create_dir_if_not_exists=True)
+    validateDir(
+        GENERATED_DATA_DIR,
+        "generated data dir doesn't exist",
+        create_dir_if_not_exists=True)
+    validateDir(
+        EXTRACTED_DATA_DIR,
+        "extracted data dir doesn't exist",
+        create_dir_if_not_exists=True)
+    validateDir(
+        EXTRACTED_ASSETS_DIR,
+        "extracted assets dir doesn't exist",
+        create_dir_if_not_exists=True)
+    validateDir(
+        CACHED_MCA_JSON_DIR,
+        "cached mca json file dir not found",
+        create_dir_if_not_exists=True)
+    validateDir(
+        TEMP_PLAYERDATA_JSON_DIR,
+        "temp playerdat json dir doesn't exist",
+        create_dir_if_not_exists=True)
+    validateDir(
+        TEMP_LOG_JSON_DIR,
+        "temp log json dir doesn't exist",
+        create_dir_if_not_exists=True)
+    validateDir(
+        TEMP_ADVANCEMENT_JSON_DIR,
+        "temp advancement dir doesn't exist",
+        create_dir_if_not_exists=True)
+    validateDir(
+        TEMP_PROFILE_JSON_DIR,
+        "temp profile dir doesn't exist",
+        create_dir_if_not_exists=True)
+    validateDir(
+        TEMP_STATS_JSON_DIR,
+        "temp stats dir doesn't exist",
+        create_dir_if_not_exists=True)
     _LOGGER.debug("Non-existent files: {}".format(NONEXISTENT_FILES))
 
 
-def validateFile(filepath: str, notfound_message: str, quit_on_failure=False) -> None:
+def validateFile(filepath: str, notfound_message: str,
+                 quit_on_failure=False) -> None:
     if not os.path.isfile(filepath):
         if quit_on_failure:
             _LOGGER.error("{}:{}".format(notfound_message, filepath))
@@ -141,7 +194,10 @@ def validateFile(filepath: str, notfound_message: str, quit_on_failure=False) ->
         _LOGGER.debug("{} is a file".format(os.path.basename(filepath)))
 
 
-def validateDir(dirpath: str, notfound_message: str, quit_on_failure=False, create_dir_if_not_exists=False) -> None:
+def validateDir(dirpath: str,
+                notfound_message: str,
+                quit_on_failure=False,
+                create_dir_if_not_exists=False) -> None:
     if not os.path.isdir(dirpath):
         if quit_on_failure:
             _LOGGER.error("{}:{}".format(notfound_message, dirpath))
