@@ -7,20 +7,26 @@ import mcdata_to_json.configuration as Config
 
 
 def cache_possible_advancements() -> None:
-    advancementsList = {}
-    domains = os.listdir(Config.EXTRACTED_DATA_DIR)
-    for domain in domains:
-        if os.path.isdir(os.path.join(Config.EXTRACTED_DATA_DIR, domain)):
-            if domain not in advancementsList:
-                advancementsList[domain] = {}
-            add_categories_to_domain(
-                advancementsList[domain],
-                os.path.join(Config.EXTRACTED_DATA_DIR, domain,
-                             'advancements'))
+    advancementsList = create_advancement_dictionary_from_filestructure(
+        Config.EXTRACTED_DATA_DIR)
     with open(
             os.path.join(Config.TEMP_DIR, 'possible_advancements.json'),
             'w') as f:
         f.write(json.dumps(advancementsList))
+
+
+def create_advancement_dictionary_from_filestructure(
+        containingPath: str) -> typing.Dict:
+    advDict: dict = {}
+    domains = os.listdir(containingPath)
+    for domain in domains:
+        if os.path.isdir(os.path.join(containingPath, domain)):
+            if domain not in advDict:
+                advDict[domain] = {}
+            add_categories_to_domain(
+                advDict[domain],
+                os.path.join(containingPath, domain, 'advancements'))
+    return advDict
 
 
 def add_categories_to_domain(domainDict: typing.Dict,

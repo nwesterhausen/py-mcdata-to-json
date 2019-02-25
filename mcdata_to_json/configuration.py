@@ -2,13 +2,10 @@
 import os
 import logging
 import sys
+import typing
+import mcdata_to_json.error_handling as errors
 
-from typing import Dict, List
 from argparse import ArgumentParser
-
-from mcdata_to_json import LOGGER_NAME
-
-_LOGGER = logging.getLogger(name=LOGGER_NAME)
 
 parser = ArgumentParser(
     description="Python tool to create JSON files from minecraft server data.")
@@ -46,13 +43,6 @@ parser.add_argument(
     help="Destination directory for JSON files.",
     metavar="CACHEDIR",
     default="./mcdata_cache")
-parser.add_argument(
-    "-q",
-    "--quiet",
-    action="store_false",
-    dest="verbose",
-    default=True,
-    help="don't print status messages to stdout")
 
 args = parser.parse_args()
 
@@ -100,11 +90,11 @@ TEMP_ADVANCEMENT_JSON_DIR: str = os.path.join(TEMP_DIR, 'advancements')
 TEMP_PROFILE_JSON_DIR: str = os.path.join(TEMP_DIR, 'profiles')
 TEMP_STATS_JSON_DIR: str = os.path.join(TEMP_DIR, 'stats')
 
-NONEXISTENT_FILES: List[str] = []
+NONEXISTENT_FILES: typing.List[str] = []
 
 
 def validatePaths() -> None:
-    validateDir(MC_DIR, "minecraft dir invalid", quit_on_failure=True)
+    validateDir(MC_DIR, "minecraft dir invalid", raise_on_failure=True)
     validateFile(MCJAR_FILE, "minecraft server jar")
     validateDir(
         OUTPUT_DIR, "specified output dir", create_dir_if_not_exists=True)
@@ -164,41 +154,29 @@ def validatePaths() -> None:
         create_dir_if_not_exists=True)
     validateDir(
         TEMP_STATS_JSON_DIR, "temp stats dir", create_dir_if_not_exists=True)
-    _LOGGER.debug("Non-existent files: {}".format(NONEXISTENT_FILES))
 
 
 def validateFile(filepath: str, notfound_message: str,
-                 quit_on_failure=False) -> None:
+                 raise_on_failure=False) -> None:
     if not os.path.isfile(filepath):
-        if quit_on_failure:
-            _LOGGER.error("File : {}. ({})".format(filepath, notfound_message))
-            sys.exit()
+        if raise_on_failure:
+            raise errors.MissingRequiredFileError("File : {}. ({})".format(
+                filepath, notfound_message))
         else:
-            _LOGGER.warn("File : {}. ({})".format(filepath, notfound_message))
             NONEXISTENT_FILES.append(filepath)
-    else:
-        _LOGGER.debug("{} file exists".format(os.path.basename(filepath)))
 
 
 def validateDir(dirpath: str,
                 notfound_message: str,
-                quit_on_failure=False,
+                raise_on_failure=False,
                 create_dir_if_not_exists=False) -> None:
     if not os.path.isdir(dirpath):
-        if quit_on_failure:
-            _LOGGER.error("Dir : {} ({})".format(
+        if raise_on_failure:
+            raise errors.MissingRequiredFileError("Dir : {} ({})".format(
                 dirpath,
                 notfound_message,
             ))
-            sys.exit()
         elif create_dir_if_not_exists:
             os.mkdir(dirpath)
-            _LOGGER.info("Created {}.".format(os.path.basename(dirpath)))
         else:
-            _LOGGER.warn("Dir : {} ({})".format(
-                dirpath,
-                notfound_message,
-            ))
             NONEXISTENT_FILES.append(dirpath)
-    else:
-        _LOGGER.debug("{} dir exists.".format(os.path.basename(dirpath)))
