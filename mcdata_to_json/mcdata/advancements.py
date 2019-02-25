@@ -5,13 +5,63 @@ import json
 
 import mcdata_to_json.configuration as Config
 
+POSSIBLE_ADVANCEMENTS_FILE = os.path.join(Config.TEMP_DIR,
+                                          'possible_advancements.json')
+COMPLETED_ADVANCEMENTS_FILE = os.path.join(Config.OUTPUT_DIR,
+                                           'server_advancements.json')
+
+
+def save_completed_advancements(uuids: list) -> None:
+    """Read through player advancements and note progress at server level"""
+    # First read possible advancements
+    serverAdvancements: dict = {}
+    with open(POSSIBLE_ADVANCEMENTS_FILE, 'r') as f:
+        serverAdvancements = json.loads(f.read())
+    # Then read player-by-player
+    for uuid in uuids:
+        f = open(
+            os.path.join(Config.TEMP_ADVANCEMENT_JSON_DIR, f"{uuid}.json"))
+        serverAdvancements = fillin_completed_advancements(
+            serverAdvancements, uuid, json.loads(f.read()))
+    # Last write advancements progress
+    with open(COMPLETED_ADVANCEMENTS_FILE, 'w') as f:
+        f.write(json.dumps(serverAdvancements))
+
+
+def fillin_completed_advancements(
+        possibleAdvancements: dict, uuid: str,
+        playerCompletedAdvancements: dict) -> typing.Dict:
+    """Mark the completed player advancements in possible advancements"""
+    for domain in possibleAdvancements:
+        for category in possibleAdvancements[domain]:
+            if category in playerCompletedAdvancements[domain]:
+                for advancement in possibleAdvancements[domain][category]:
+                    if advancement in playerCompletedAdvancements[domain][
+                            category]:
+                        possibleAdvancements[domain][category][
+                            advancement] = mark_if_advancement_completed(
+                                possibleAdvancements[domain][category]
+                                [advancement],
+                                playerCompletedAdvancements[domain][category]
+                                [advancement], uuid)
+
+    return possibleAdvancements
+
+
+def mark_if_advancement_completed(serverAdvancement: dict,
+                                  playerAdvancement: dict, uuid: str) -> dict:
+    if playerAdvancement['done']:
+        serverAdvancement['completed'].append(uuid)
+    for critereon in serverAdvancement['criteria']:
+        if critereon in playerAdvancement['criteria']:
+            serverAdvancement['criteria'][critereon]['completed'].append(uuid)
+    return serverAdvancement
+
 
 def cache_possible_advancements() -> None:
     advancementsList = create_advancement_dictionary_from_filestructure(
         Config.EXTRACTED_DATA_DIR)
-    with open(
-            os.path.join(Config.TEMP_DIR, 'possible_advancements.json'),
-            'w') as f:
+    with open(POSSIBLE_ADVANCEMENTS_FILE, 'w') as f:
         f.write(json.dumps(advancementsList))
 
 
@@ -58,7 +108,3 @@ def get_dict_from_advancement_json(advancementpath: str) -> typing.Dict:
             advdict['criteria'][critereon]['completed'] = []
         advdict['completed'] = []
         return advdict
-
-
-if __name__ == '__main__':
-    cache_possible_advancements()

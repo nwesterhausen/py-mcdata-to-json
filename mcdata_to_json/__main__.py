@@ -31,6 +31,7 @@ for uuid in UUIDS:
 
 data_extractor.extract_server_jar_assets()
 advancements.cache_possible_advancements()
+advancements.save_completed_advancements(UUIDS.copy())
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(mojang_api.save_cache_mojang_profiles(UUIDS.copy()))
