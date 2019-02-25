@@ -33,11 +33,16 @@ async def save_cache_mojang_profiles(uuids: typing.List) -> None:
     # Age check here as well?
     async with aiohttp.ClientSession() as session:
         for uuid in uuids:
-            profilejson = await get_mojang_profile(uuid, session)
-            with open(
-                    os.path.join(Config.TEMP_PROFILE_JSON_DIR,
-                                 "{}.json".format(uuid)), 'w') as pf:
-                pf.write(json.dumps(profilejson))
+            try:
+                profilejson = await get_mojang_profile(uuid, session)
+                with open(
+                        os.path.join(Config.TEMP_PROFILE_JSON_DIR,
+                                     "{}.json".format(uuid)), 'w') as pf:
+                    pf.write(json.dumps(profilejson))
+            except errors.InvalidQueryError:
+                return
+            except errors.Non200ResponseError:
+                raise
 
 
 async def get_mojang_profile(uuid: str,
@@ -48,7 +53,7 @@ async def get_mojang_profile(uuid: str,
         respjson = await resp.json()
         if resp.status == 200:
             if 'error' in respjson:
-                errors.InvalidQueryError(json.dumps(respjson))
+                raise errors.InvalidQueryError(json.dumps(respjson))
             else:
                 for property in respjson["properties"]:
                     b64_value = property["value"]
@@ -57,7 +62,7 @@ async def get_mojang_profile(uuid: str,
                         base64.decodebytes(str.encode(b64_value)))
                 return respjson
         else:
-            errors.Non200ResponseError(
+            raise errors.Non200ResponseError(
                 "Unable to get profile for {} due to {}:{}".format(
                     uuid, resp.status, resp.reason))
         return emptyResponse
