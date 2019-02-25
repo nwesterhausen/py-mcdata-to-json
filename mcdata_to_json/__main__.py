@@ -19,6 +19,7 @@ if (Config.PLAYERDATA_DIR not in Config.NONEXISTENT_FILES):
         map(lambda fn: fn.replace('.dat', ''),
             os.listdir(Config.PLAYERDATA_DIR)))
 
+print(f'Caching json versions of all ({len(UUIDS)}) players data')
 for uuid in UUIDS:
     player.save_temp_playerdata_json(uuid)
     player.save_temp_advancement_json(uuid)
