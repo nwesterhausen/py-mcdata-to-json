@@ -18,8 +18,10 @@ def uri_encode_uuid(uuid: str) -> str:
 
 
 def uri_decode_uuid(uuid: str) -> str:
-    return '-'.join(
-        [uuid[0, 8], uuid[8, 12], uuid[12, 16], uuid[16, 20], uuid[20]])
+    return '-'.join([
+        uuid[slice(0, 8)], uuid[slice(8, 12)], uuid[slice(12, 16)], uuid[slice(
+            16, 20)], uuid[slice(20)]
+    ])
 
 
 async def save_cache_mojang_profiles(uuids: typing.List) -> None:
