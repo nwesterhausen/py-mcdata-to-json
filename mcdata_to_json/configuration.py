@@ -105,79 +105,65 @@ NONEXISTENT_FILES: List[str] = []
 
 def validatePaths() -> None:
     validateDir(MC_DIR, "minecraft dir invalid", quit_on_failure=True)
-    validateFile(MCJAR_FILE, "minecraft server jar doesn't exist")
+    validateFile(MCJAR_FILE, "minecraft server jar")
     validateDir(
-        OUTPUT_DIR,
-        "specified output dir doesn't exist",
-        create_dir_if_not_exists=True)
+        OUTPUT_DIR, "specified output dir", create_dir_if_not_exists=True)
+    validateDir(WORK_DIR, "specified cache dir", create_dir_if_not_exists=True)
+    validateFile(PROPERTIES_FILE, "server.properties")
+    validateFile(USERCACHE_FILE, "usercache.json ")
+    validateFile(OPSLIST_FILE, "ops.json ")
+    validateDir(LOGS_DIR, "logs")
+    validateDir(WORLD_DIR, "world")
+    validateDir(WORLD_DATA_DIR, "data dir")
+    validateDir(DATAPACKS_DIR, "datapacks dir")
+    validateDir(STATS_DIR, "stats dir")
+    validateDir(ADVANCEMENTS_DIR, "advancements dir")
+    validateDir(PLAYERDATA_DIR, "playerdata dir")
+    validateFile(LEVELDAT_FILE, "level.dat")
+    validateDir(OVERWORLD_REGION_DIR, "world region")
+    validateDir(NETHER_DIR, "DIM-1")
+    validateDir(NETHER_REGION_DIR, "region")
+    validateDir(NETHER_DATA_DIR, "data")
+    validateDir(END_DIR, "DIM1")
+    validateDir(END_REGION_DIR, "region")
+    validateDir(END_DATA_DIR, "data")
+    validateDir(TEMP_DIR, "temp dir", create_dir_if_not_exists=True)
     validateDir(
-        WORK_DIR,
-        "specified cache dir doesn't exist",
-        create_dir_if_not_exists=True)
-    validateFile(PROPERTIES_FILE, "server.properties doesn't exist")
-    validateFile(USERCACHE_FILE, "usercache.json not found")
-    validateFile(OPSLIST_FILE, "ops.json not found")
-    validateDir(LOGS_DIR, "logs not found in minecraft dir")
-    validateDir(WORLD_DIR, "world not found in minecraft dir")
-    validateDir(WORLD_DATA_DIR, "data dir not found in world dir")
-    validateDir(DATAPACKS_DIR, "datapacks dir not found in world dir")
-    validateDir(STATS_DIR, "stats dir not found in world dir")
-    validateDir(ADVANCEMENTS_DIR, "advancements dir not found in world dir")
-    validateDir(PLAYERDATA_DIR, "playerdata dir not found in world dir")
-    validateFile(LEVELDAT_FILE, "level.dat not found in world dir")
-    validateDir(OVERWORLD_REGION_DIR, "world region not found in world dir")
-    validateDir(NETHER_DIR, "DIM-1 not found in world dir")
-    validateDir(NETHER_REGION_DIR, "region not found in DIM-1")
-    validateDir(NETHER_DATA_DIR, "data not found in DIM-1")
-    validateDir(END_DIR, "DIM1 not found in world dir")
-    validateDir(END_REGION_DIR, "region not found in DIM1")
-    validateDir(END_DATA_DIR, "data not found in DIM1")
+        EXTRACTED_DIR, "extracted data dir", create_dir_if_not_exists=True)
     validateDir(
-        TEMP_DIR, "temp dir doesn't exist", create_dir_if_not_exists=True)
-    validateDir(
-        EXTRACTED_DIR,
-        "extracted data dir doesn't exist",
-        create_dir_if_not_exists=True)
-    validateDir(
-        GENERATED_DIR,
-        "generated data dir doesn't exist",
-        create_dir_if_not_exists=True)
+        GENERATED_DIR, "generated data dir", create_dir_if_not_exists=True)
     validateDir(
         GENERATED_DATA_DIR,
-        "generated data dir doesn't exist",
+        "generated data dir",
         create_dir_if_not_exists=True)
     validateDir(
         EXTRACTED_DATA_DIR,
-        "extracted data dir doesn't exist",
+        "extracted data dir",
         create_dir_if_not_exists=True)
     validateDir(
         EXTRACTED_ASSETS_DIR,
-        "extracted assets dir doesn't exist",
+        "extracted assets dir",
         create_dir_if_not_exists=True)
     validateDir(
         CACHED_MCA_JSON_DIR,
-        "cached mca json file dir not found",
+        "cached mca json file dir ",
         create_dir_if_not_exists=True)
     validateDir(
         TEMP_PLAYERDATA_JSON_DIR,
-        "temp playerdat json dir doesn't exist",
+        "temp playerdat json dir",
         create_dir_if_not_exists=True)
     validateDir(
-        TEMP_LOG_JSON_DIR,
-        "temp log json dir doesn't exist",
-        create_dir_if_not_exists=True)
+        TEMP_LOG_JSON_DIR, "temp log json dir", create_dir_if_not_exists=True)
     validateDir(
         TEMP_ADVANCEMENT_JSON_DIR,
-        "temp advancement dir doesn't exist",
+        "temp advancement dir",
         create_dir_if_not_exists=True)
     validateDir(
         TEMP_PROFILE_JSON_DIR,
-        "temp profile dir doesn't exist",
+        "temp profile dir",
         create_dir_if_not_exists=True)
     validateDir(
-        TEMP_STATS_JSON_DIR,
-        "temp stats dir doesn't exist",
-        create_dir_if_not_exists=True)
+        TEMP_STATS_JSON_DIR, "temp stats dir", create_dir_if_not_exists=True)
     _LOGGER.debug("Non-existent files: {}".format(NONEXISTENT_FILES))
 
 
@@ -185,13 +171,13 @@ def validateFile(filepath: str, notfound_message: str,
                  quit_on_failure=False) -> None:
     if not os.path.isfile(filepath):
         if quit_on_failure:
-            _LOGGER.error("{}:{}".format(notfound_message, filepath))
+            _LOGGER.error("File : {}. ({})".format(filepath, notfound_message))
             sys.exit()
         else:
-            _LOGGER.warn("{}:{}".format(notfound_message, filepath))
+            _LOGGER.warn("File : {}. ({})".format(filepath, notfound_message))
             NONEXISTENT_FILES.append(filepath)
     else:
-        _LOGGER.debug("{} is a file".format(os.path.basename(filepath)))
+        _LOGGER.debug("{} file exists".format(os.path.basename(filepath)))
 
 
 def validateDir(dirpath: str,
@@ -200,13 +186,19 @@ def validateDir(dirpath: str,
                 create_dir_if_not_exists=False) -> None:
     if not os.path.isdir(dirpath):
         if quit_on_failure:
-            _LOGGER.error("{}:{}".format(notfound_message, dirpath))
+            _LOGGER.error("Dir : {} ({})".format(
+                dirpath,
+                notfound_message,
+            ))
             sys.exit()
         elif create_dir_if_not_exists:
             os.mkdir(dirpath)
             _LOGGER.info("Created {}.".format(os.path.basename(dirpath)))
         else:
-            _LOGGER.warn("{}:{}".format(notfound_message, dirpath))
+            _LOGGER.warn("Dir : {} ({})".format(
+                dirpath,
+                notfound_message,
+            ))
             NONEXISTENT_FILES.append(dirpath)
     else:
-        _LOGGER.debug("{} is a dir".format(os.path.basename(dirpath)))
+        _LOGGER.debug("{} dir exists.".format(os.path.basename(dirpath)))
