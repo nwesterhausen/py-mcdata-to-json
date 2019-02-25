@@ -8,8 +8,8 @@ from typing import List
 
 import mcdata_to_json.configuration as Config
 import mcdata_to_json.mojang_api as mojang_api
-import mcdata_to_json.mcdata as mcdata
-from mcdata_to_json.player import playerdata, advancements, stats
+from mcdata_to_json.mcdata import data_extractor, advancements
+import mcdata_to_json.player as player
 from mcdata_to_json import LOGGER_NAME
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -25,12 +25,12 @@ if (Config.PLAYERDATA_DIR not in Config.NONEXISTENT_FILES):
 
 _LOGGER.info("Found {} players".format(len(UUIDS)))
 for uuid in UUIDS:
-    playerdata.save_temp_playerdata_json(uuid)
-    advancements.save_temp_advancement_json(uuid)
-    stats.save_temp_stats_json(uuid)
+    player.save_temp_playerdata_json(uuid)
+    player.save_temp_advancement_json(uuid)
+    player.save_temp_stats_json(uuid)
 
-mcdata.data_extractor.extract_server_jar_assets()
-mcdata.advancements.cache_possible_advancements()
+data_extractor.extract_server_jar_assets()
+advancements.cache_possible_advancements()
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(mojang_api.save_cache_mojang_profiles(UUIDS.copy()))
