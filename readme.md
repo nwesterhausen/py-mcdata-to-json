@@ -2,6 +2,19 @@
 
 Python script to generate json files from a minecraft server.
 
+Currently when provided a minecraft server directory that contains a minecraft server jar named `server.jar`, it will run and save the following information:
+
+- server-advancements.json
+  - possible advancements and which player has what critera complete
+- `<player-uuid>`.json
+  - advancements progress
+  - stats
+  - playerdata (includes inventory and ender chest)
+  - in-game name
+  - url to skin texture
+- uuids.json
+  - dictionary of `<player-uuid>`: 'in-game name'
+
 ## Usage
 
 Clone this repository (or download a release and unzip). Inside the `py-mcdata-to-json` folder:

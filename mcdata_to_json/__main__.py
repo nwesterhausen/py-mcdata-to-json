@@ -36,3 +36,5 @@ loop.run_until_complete(mojang_api.save_cache_mojang_profiles(UUIDS.copy()))
 loop.close()
 
 print(f'Exporting combined JSON for {len(UUIDS)} players.')
+list(map(player.export_player_json, UUIDS))
+player.export_uuid_dict(UUIDS.copy())
