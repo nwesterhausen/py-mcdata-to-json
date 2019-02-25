@@ -35,5 +35,3 @@ advancements.cache_possible_advancements()
 loop = asyncio.get_event_loop()
 loop.run_until_complete(mojang_api.save_cache_mojang_profiles(UUIDS.copy()))
 loop.close()
-
-print(UUIDS)
