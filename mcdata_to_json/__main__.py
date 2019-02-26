@@ -8,6 +8,7 @@ from typing import List
 
 import mcdata_to_json.configuration as Config
 import mcdata_to_json.mojang_api as mojang_api
+import mcdata_to_json.dat_exporter as dat_exporter
 from mcdata_to_json.mcdata import data_extractor, advancements
 import mcdata_to_json.player as player
 
@@ -31,6 +32,13 @@ data_extractor.extract_server_jar_assets()
 advancements.cache_possible_advancements()
 print('Exporting server advancements progress')
 advancements.save_completed_advancements(UUIDS.copy())
+
+print('Exporting level.dat and scoreboard to json.')
+dat_exporter.export_level_dat()
+dat_exporter.export_scoreboard_dat()
+print('Exporting raids and villages dat files to json.')
+dat_exporter.export_raids_dat()
+dat_exporter.export_villages_dat()
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(mojang_api.save_cache_mojang_profiles(UUIDS.copy()))
