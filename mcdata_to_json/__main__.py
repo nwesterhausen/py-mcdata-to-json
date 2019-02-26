@@ -1,7 +1,5 @@
 """Main runner"""
-import logging
 import os
-import sys
 import asyncio
 
 from typing import List
