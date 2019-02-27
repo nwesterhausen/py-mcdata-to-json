@@ -12,7 +12,7 @@ from mcdata_to_json.tools import advancement_json_to_tree, dict_merge
 def save_temp_playerdata_json(uuid):
     filepath = os.path.join(Config.PLAYERDATA_DIR, "{}.dat".format(uuid))
     nbt = nbtlib.load(filepath)
-    jsnbt = json.dumps(nbt[""])
+    jsnbt = json.dumps(nbt.root)
     with open(
             os.path.join(Config.TEMP_PLAYERDATA_JSON_DIR,
                          "{}.json".format(uuid)), 'w') as f:

@@ -9,6 +9,7 @@ import mcdata_to_json.mojang_api as mojang_api
 import mcdata_to_json.dat_exporter as dat_exporter
 from mcdata_to_json.mcdata import data_extractor, advancements
 import mcdata_to_json.player as player
+import mcdata_to_json.mca_parser as mca_parser
 
 Config.validatePaths()
 
@@ -40,6 +41,9 @@ dat_exporter.export_villages_dat()
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(mojang_api.save_cache_mojang_profiles(UUIDS.copy()))
+
+mca_parser.cache_json_for_region_files()
+
 loop.close()
 
 print(f'Exporting combined JSON for {len(UUIDS)} players.')
