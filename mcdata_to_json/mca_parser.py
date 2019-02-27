@@ -43,7 +43,7 @@ def cache_nbtjson_for_region(regionfilepath):
     shouldCheckCached = False
     nbtjson: dict = {'TileEntities': [], 'Entities': [], 'Chunks': {}}
     updatedChunks = 0
-    if (os.path.exists(cachepath)):
+    if os.path.exists(cachepath) and os.path.getsize(cachepath) > 100:
         shouldCheckCached = True
         cachef = open(cachepath)
         nbtjson = json.loads(cachef.read())
@@ -84,10 +84,11 @@ def nbtjson_for_chunk(mcaobj, x, z):
     if mcaobj.get_timestamp(x, z) == 0:
         return EMPTY_CHUNK
     region = mcaobj.get_data(x, z)
-    nbt = nbtlib.File.parse(io.BytesIO(region))
-    if mcaobj.get_data_size(x, z) == 0 or nbt.root_name == None:
+    nbt = nbtlib.Compound.parse(io.BytesIO(region))
+    if mcaobj.get_data_size(x, z) == 0 or len(
+            nbt.keys()) == 0 or 'Level' not in nbt[""].keys():
         return EMPTY_CHUNK
-    return recast_nbt_to_normals(nbt.root)
+    return recast_nbt_to_normals(nbt[""])
 
 
 def save_cached_json(region, nbtjson):
@@ -103,6 +104,10 @@ def recast_nbt_to_normals(nbtroot: nbtlib.tag.Compound) -> dict:
     level = NUMBER_TYPE_RE.sub(r'\1', level)
     level = LIST_TYPE_RE.sub(r'[', level)
     level = ast.literal_eval(level)
+    if 'Status' not in level.keys():
+        level['Status'] = 'unknown'
+    if 'Structures' not in level.keys():
+        level['Structures'] = {}
     return {
         'xPos': level['xPos'],
         'zPos': level['zPos'],
@@ -117,7 +122,7 @@ def recast_nbt_to_normals(nbtroot: nbtlib.tag.Compound) -> dict:
 
 
 if __name__ == '__main__':
-    # cache_nbtjson_for_region(
-    #     os.path.join(Config.OVERWORLD_REGION_DIR, 'r.-7.-2.mca'))
-    m = Mca(os.path.join(Config.OVERWORLD_REGION_DIR, 'r.-1.-1.mca'))
-    print(nbtjson_for_chunk(m, 8, 20))
+    cache_nbtjson_for_region(
+        os.path.join(Config.OVERWORLD_REGION_DIR, 'r.4.-1.mca'))
+    # m = Mca(os.path.join(Config.OVERWORLD_REGION_DIR, 'r.4.-1.mca'))
+    # print(nbtjson_for_chunk(m, 0, 3))
