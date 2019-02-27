@@ -10,15 +10,20 @@ from mcdata_to_json.mcdata.mca_reader import Mca
 from mcdata_to_json.tools import dict_merge
 
 UNQUOTED_KEY_RE = re.compile("(\w+): ")
-NUMBER_TYPE_RE = re.compile("([0-9.]+)(b|f|L|d|s)")
+NUMBER_TYPE_RE = re.compile("([0-9][0-9.]*)(b|f|L|d|s)")
 LIST_TYPE_RE = re.compile("\[(I);")
 
 
 def cache_json_for_region_files():
     """Saves json for each region file into the data cache"""
     for filename in os.listdir(Config.OVERWORLD_REGION_DIR):
-        cache_nbtjson_for_region(
-            os.path.join(Config.OVERWORLD_REGION_DIR, filename))
+        cacheFilepath = os.path.join(Config.CACHED_MCA_JSON_DIR,
+                                     filename.replace('.mca', '.json'))
+        rawFilepath = os.path.join(Config.OVERWORLD_REGION_DIR, filename)
+        if not os.path.exists(cacheFilepath) or os.path.getmtime(
+                cacheFilepath) < os.path.getmtime(rawFilepath):
+            cache_nbtjson_for_region(
+                os.path.join(Config.OVERWORLD_REGION_DIR, filename))
 
 
 def cache_nbtjson_for_region(regionfilepath):
@@ -62,11 +67,9 @@ def recast_nbt_to_normals(nbtroot: nbtlib.tag.Compound) -> dict:
         ents = LIST_TYPE_RE.sub(r'', ents)
         ents = ast.literal_eval(ents)
         tents = nbtroot['Level']['TileEntities'].__str__()
-        # print(tents)
         tents = UNQUOTED_KEY_RE.sub(r'"\1": ', tents)
         tents = NUMBER_TYPE_RE.sub(r'\1', tents)
         tents = LIST_TYPE_RE.sub(r'[', tents)
-        # print(tents)
         tents = ast.literal_eval(tents)
     else:
         ents = []
@@ -75,7 +78,7 @@ def recast_nbt_to_normals(nbtroot: nbtlib.tag.Compound) -> dict:
 
 
 if __name__ == '__main__':
-    cache_nbtjson_for_region(
-        os.path.join(Config.OVERWORLD_REGION_DIR, 'r.-1.5.mca'))
-    m = Mca(os.path.join(Config.OVERWORLD_REGION_DIR, 'r.-1.-5.mca'))
-    print(nbtjson_for_chunk(m, 0, 30))
+    # cache_nbtjson_for_region(
+    #     os.path.join(Config.OVERWORLD_REGION_DIR, 'r.-1.5.mca'))
+    m = Mca(os.path.join(Config.OVERWORLD_REGION_DIR, 'r.-1.-1.mca'))
+    print(nbtjson_for_chunk(m, 1, 9))
