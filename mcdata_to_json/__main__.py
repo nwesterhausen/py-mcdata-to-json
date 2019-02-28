@@ -41,16 +41,13 @@ print('Exporting raids and villages dat files to json.')
 dat_exporter.export_raids_dat()
 dat_exporter.export_villages_dat()
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(mojang_api.save_cache_mojang_profiles(UUIDS.copy()))
+asyncio.run(mojang_api.save_cache_mojang_profiles(UUIDS.copy()))
 
 mca_parser.cache_json_for_region_files()
-
-loop.close()
 
 print(f'Exporting combined JSON for {len(UUIDS)} players.')
 list(map(player.export_player_json, UUIDS))
 player.export_uuid_dict(UUIDS.copy())
 
 end = time.time()
-print(f'Total seconds of execution: {end - start}')
+print('Total time of execution: {:.2f}s'.format(end - start))
