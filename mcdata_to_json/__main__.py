@@ -10,6 +10,8 @@ import mcdata_to_json.dat_exporter as dat_exporter
 from mcdata_to_json.mcdata import data_extractor, advancements
 import mcdata_to_json.player as player
 import mcdata_to_json.mca_parser as mca_parser
+import time
+start = time.time()
 
 Config.validatePaths()
 
@@ -49,3 +51,6 @@ loop.close()
 print(f'Exporting combined JSON for {len(UUIDS)} players.')
 list(map(player.export_player_json, UUIDS))
 player.export_uuid_dict(UUIDS.copy())
+
+end = time.time()
+print(f'Total seconds of execution: {end - start}')

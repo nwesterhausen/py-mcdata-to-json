@@ -84,6 +84,9 @@ GENERATED_DATA_DIR: str = os.path.join(GENERATED_DIR, 'data')
 EXTRACTED_DATA_DIR: str = os.path.join(EXTRACTED_DIR, 'data')
 EXTRACTED_ASSETS_DIR: str = os.path.join(EXTRACTED_DIR, 'assets')
 CACHED_MCA_JSON_DIR: str = os.path.join(WORK_DIR, 'mcajson')
+OVERWORLD_MCA_CACHE_DIR: str = os.path.join(CACHED_MCA_JSON_DIR, 'world')
+NETHER_MCA_CACHE_DIR: str = os.path.join(CACHED_MCA_JSON_DIR, 'nether')
+END_MCA_CACHE_DIR: str = os.path.join(CACHED_MCA_JSON_DIR, 'end')
 TEMP_PLAYERDATA_JSON_DIR: str = os.path.join(TEMP_DIR, 'playerdata')
 TEMP_LOG_JSON_DIR: str = os.path.join(TEMP_DIR, 'logs')
 TEMP_ADVANCEMENT_JSON_DIR: str = os.path.join(TEMP_DIR, 'advancements')
@@ -136,6 +139,18 @@ def validatePaths() -> None:
         create_dir_if_not_exists=True)
     validateDir(
         CACHED_MCA_JSON_DIR,
+        "cached mca json file dir ",
+        create_dir_if_not_exists=True)
+    validateDir(
+        OVERWORLD_MCA_CACHE_DIR,
+        "cached mca json file dir ",
+        create_dir_if_not_exists=True)
+    validateDir(
+        NETHER_MCA_CACHE_DIR,
+        "cached mca json file dir ",
+        create_dir_if_not_exists=True)
+    validateDir(
+        END_MCA_CACHE_DIR,
         "cached mca json file dir ",
         create_dir_if_not_exists=True)
     validateDir(

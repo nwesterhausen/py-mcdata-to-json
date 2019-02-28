@@ -31,14 +31,36 @@ def cache_json_for_region_files():
     """Saves json for each region file into the data cache"""
     for filename in os.listdir(Config.OVERWORLD_REGION_DIR):
         cache_nbtjson_for_region(
-            os.path.join(Config.OVERWORLD_REGION_DIR, filename))
+            os.path.join(Config.OVERWORLD_REGION_DIR, filename),
+            Config.OVERWORLD_MCA_CACHE_DIR)
+    print()
+    print(
+        f'Cached JSON for {len(os.listdir(Config.OVERWORLD_REGION_DIR))} region files in the world.'
+    )
+    if Config.NETHER_REGION_DIR not in Config.NONEXISTENT_FILES:
+        for filename in os.listdir(Config.NETHER_REGION_DIR):
+            cache_nbtjson_for_region(
+                os.path.join(Config.NETHER_REGION_DIR, filename),
+                Config.NETHER_MCA_CACHE_DIR)
+        print()
+        print(
+            f'Cached JSON for {len(os.listdir(Config.NETHER_REGION_DIR))} region files in the nether.'
+        )
+    if Config.END_REGION_DIR not in Config.NONEXISTENT_FILES:
+        for filename in os.listdir(Config.END_REGION_DIR):
+            cache_nbtjson_for_region(
+                os.path.join(Config.END_REGION_DIR, filename),
+                Config.END_MCA_CACHE_DIR)
+        print()
+        print(
+            f'Cached JSON for {len(os.listdir(Config.END_REGION_DIR))} region files in the nether.'
+        )
 
 
-def cache_nbtjson_for_region(regionfilepath):
+def cache_nbtjson_for_region(regionfilepath: str, outputpath: str):
     """Saves json for the provided region file (r.1.1.mca)"""
     region = os.path.basename(regionfilepath).replace('.mca', '')
-    cachepath = os.path.join(Config.CACHED_MCA_JSON_DIR, f'{region}.json')
-    print(f'Working region {region}')
+    cachepath = os.path.join(outputpath, f'{region}.json')
     mca = Mca(regionfilepath)
     shouldCheckCached = False
     nbtjson: dict = {'TileEntities': [], 'Entities': [], 'Chunks': {}}
@@ -54,9 +76,14 @@ def cache_nbtjson_for_region(regionfilepath):
                 if mca.get_timestamp(i,
                                      j) == nbtjson[f'x{i}z{j}']['Timestamp']:
                     sys.stdout.write(
-                        f'\rCache is up to date for {i}, {j}      ')
+                        '\rScanning {:10s} Cache is up to date for {:2d}, {:2d}'
+                        .format(region, i, j))
                     sys.stdout.flush()
                     continue
+            sys.stdout.write(
+                '\rScanning {:10s} Updating chunk {:2d}, {:2d}         '.
+                format(region, i, j))
+            sys.stdout.flush()
             chunkjson = nbtjson_for_chunk(mca, i, j)
             updatedChunks += 1
             nbtjson['TileEntities'].extend(chunkjson['TileEntities'])
@@ -71,16 +98,15 @@ def cache_nbtjson_for_region(regionfilepath):
                 'LastUpdate': chunkjson['LastUpdate'],
                 'Biomes': chunkjson['Biomes']
             }
-    save_cached_json(region, nbtjson)
-    print()
+    save_cached_json(region, nbtjson, outputpath)
     if updatedChunks > 0:
-        print(f'Had to update the cache for {updatedChunks} / {32*32} chunks.')
+        print()
+        print(
+            f'Had to update {region} cache: {updatedChunks} / {32*32} chunks.')
 
 
 def nbtjson_for_chunk(mcaobj, x, z):
     """Return json of the nbt for the chunk at x z"""
-    sys.stdout.write(f'\rWorking chunk {x}, {z}                      ')
-    sys.stdout.flush()
     if mcaobj.get_timestamp(x, z) == 0:
         return EMPTY_CHUNK
     region = mcaobj.get_data(x, z)
@@ -91,10 +117,9 @@ def nbtjson_for_chunk(mcaobj, x, z):
     return recast_nbt_to_normals(nbt[""])
 
 
-def save_cached_json(region, nbtjson):
+def save_cached_json(region, nbtjson, outputdir):
     """Save compiled json of the chunks nbt to a cached file"""
-    with open(os.path.join(Config.CACHED_MCA_JSON_DIR, f'{region}.json'),
-              'w') as f:
+    with open(os.path.join(outputdir, f'{region}.json'), 'w') as f:
         f.write(json.dumps(nbtjson))
 
 
@@ -122,7 +147,9 @@ def recast_nbt_to_normals(nbtroot: nbtlib.tag.Compound) -> dict:
 
 
 if __name__ == '__main__':
+    Config.validatePaths()
     cache_nbtjson_for_region(
-        os.path.join(Config.OVERWORLD_REGION_DIR, 'r.4.-1.mca'))
+        os.path.join(Config.OVERWORLD_REGION_DIR, 'r.4.-1.mca'),
+        Config.OVERWORLD_MCA_CACHE_DIR)
     # m = Mca(os.path.join(Config.OVERWORLD_REGION_DIR, 'r.4.-1.mca'))
     # print(nbtjson_for_chunk(m, 0, 3))
