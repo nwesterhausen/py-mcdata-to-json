@@ -120,3 +120,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Test data
+mc-server-1.19/
+mc-singleplayer-1.19/
